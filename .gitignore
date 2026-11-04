@@ -1,0 +1,22 @@
+# Python virtual environments
+venv/
+.venv/
+**/venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Generated logs
+*.log
+
+# Generated monitoring reports
+monitoring/reports/*.json
+
+# Environment variables and secrets
+.env
+.env.*
+
+# IDE settings
+.vscode/
+.idea/
