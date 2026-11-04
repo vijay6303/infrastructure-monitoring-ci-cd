@@ -1,0 +1,58 @@
+---
+- name: Configure Infrastructure Monitoring Environment
+  hosts: localhost
+  connection: local
+  become: true
+
+  vars:
+    app_dir: /opt/devops-monitoring
+
+  tasks:
+
+    - name: Install Python virtual environment package
+      ansible.builtin.apt:
+        name: python3-venv
+        state: present
+        update_cache: true
+
+    - name: Create application directories
+      ansible.builtin.file:
+        path: "{{ app_dir }}/{{ item }}"
+        state: directory
+        mode: "0755"
+      loop:
+        - config
+        - logs
+        - reports
+
+    - name: Copy monitoring application
+      ansible.builtin.copy:
+        src: ../monitoring/monitor.py
+        dest: "{{ app_dir }}/monitor.py"
+        mode: "0644"
+
+    - name: Copy monitoring configuration
+      ansible.builtin.copy:
+        src: ../monitoring/config/config.json
+        dest: "{{ app_dir }}/config/config.json"
+        mode: "0644"
+
+    - name: Copy requirements file
+      ansible.builtin.copy:
+        src: ../monitoring/requirements.txt
+        dest: "{{ app_dir }}/requirements.txt"
+        mode: "0644"
+
+    - name: Create Python virtual environment
+      ansible.builtin.command:
+        cmd: python3 -m venv {{ app_dir }}/venv
+        creates: "{{ app_dir }}/venv/bin/python"
+
+    - name: Install Python dependencies
+      ansible.builtin.pip:
+        requirements: "{{ app_dir }}/requirements.txt"
+        virtualenv: "{{ app_dir }}/venv"
+
+    - name: Display deployment result
+      ansible.builtin.debug:
+        msg: "Infrastructure monitoring environment configured successfully."
